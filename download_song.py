@@ -1,12 +1,8 @@
 from spotify import Spotify
 from youtube import Youtube
-from editor import TagEditor
-from lastfm import LastFM
-from apple import AppleMusic
-from deezer import Deezer
+from main import MusicDownloader
 
-class download_song():
-
+class download_uri(MusicDownloader):
     def __downloadMusicFromYoutube(self, name, uri, dur):
         #finding song on youtube
         self.__youtube.get(name, dur)
@@ -28,7 +24,6 @@ class download_song():
             return False
 
     def downloadBySpotifyUri(self, uri, path):
-
         #get info
         info = self.__getSongInfoFromSpotify(uri)
 
@@ -83,6 +78,8 @@ class download_song():
                 return True
         return False
 
+
+class download_Query(MusicDownloader):
     def downloadBySearchQuery(self, query, path=None):
 
         #get info
@@ -139,6 +136,8 @@ class download_song():
         else:
             return False, None
 
+class download_file(MusicDownloader):
+
     def downloadBySpotifyUriFromFile(self, filename):
         try:
 
@@ -164,6 +163,7 @@ class download_song():
             except:
                 print('Something went wrong!')
 
+class download_playlist(MusicDownloader):
     def downloadBySpotifyUriPlaylistMode(self, playlist_uri, path):
 
         user = Spotify.User()
@@ -217,6 +217,8 @@ class download_song():
 
             notify.send(f'{info["artist"][0]} - {info["name"]}')
 
+
+class download_album(MusicDownloader):
     def downloadBySpotifyUriAlbumMode(self, album_uri, path):
 
         user = Spotify()
@@ -270,165 +272,7 @@ class download_song():
 
             notify.send(f'{info["artist"][0]} - {info["name"]}')
 
-    def downloadByDeezerUrl(self, url, path):
-
-        link = str(str(url).split('/')[-1]).split('?')[0]
-
-        #get info
-        info = self.__deezer.getSongInfo(link)
-
-        if info:
-
-            notify.send(f'{info["artist"][0]} - {info["name"]}', downloaded=False)
-
-            fixed_name = f'{info["artist"][0]} - {info["name"]}'
-            fixed_name = fixed_name.replace('.','')
-            fixed_name = fixed_name.replace(',','')
-            fixed_name = fixed_name.replace("'",'')
-            fixed_name = fixed_name.replace("/","")
-
-            #finding and download from YouTube and tagging
-            if self.__downloadMusicFromYoutube(fixed_name, info['uri'], info['duration_ms']):
-
-
-                self.__editor.setTags(
-                    data=info
-                )
-
-                cachepath = os.getcwd() + '/cache'
-                fullpath = os.getcwd() + '/Downloads'
-
-                if not os.path.exists(fullpath):
-                    os.makedirs(fullpath)
-
-                name = f'{info["artist"][0]} - {info["name"]}'
-
-                os.rename(
-                    f"{cachepath}/{info['uri']}/{info['uri']}.mp3",
-                    f"{fullpath}/{getCorrect(name)}.mp3"
-                )
-
-                print(path)
-
-                if path:
-
-                    os.rename(
-                        f"{fullpath}/{getCorrect(name)}.mp3",
-                        f"{path}/{getCorrect(name)}.mp3"
-                    )
-
-                #deleting cache
-                try:shutil.rmtree(f"cache/{info['uri']}")
-                except:pass
-
-                notify.send(f'{info["artist"][0]} - {info["name"]}')
-                return True
-        return False
-
-    def downloadByDeezerUrlAlbumMode(self, album_url, path):
-
-        link = str(str(album_url).split('/')[-1]).split('?')[0]
-
-        #get info
-        playlist = self.__deezer.getAlbum(link)
-
-        for info, i in zip(playlist['tracks'],range(len(playlist['tracks']))):
-
-            notify.send(f'{info["artist"][0]} - {info["name"]}', downloaded=False)
-
-            print(f'Downloading {i+1} of {len(playlist["tracks"])}')
-
-            fixed_name = f'{info["artist"][0]} - {info["name"]}'
-            fixed_name = fixed_name.replace('.','')
-            fixed_name = fixed_name.replace(',','')
-            fixed_name = fixed_name.replace("'",'')
-            fixed_name = fixed_name.replace("/","")
-
-            #finding and downloading from YouTube and tagging
-            self.__downloadMusicFromYoutube(fixed_name, info['uri'], info['duration_ms'])
-
-            self.__editor.setTags(
-                data=info
-            )
-
-            cachepath = os.getcwd() + '/cache'
-            fullpath = os.getcwd() + '/Downloads'
-
-            if not os.path.exists(fullpath):
-                os.makedirs(fullpath)
-
-            name = f'{info["artist"][0]} - {info["name"]}'
-
-            os.rename(
-                f"{cachepath}/{info['uri']}/{info['uri']}.mp3",
-                f"{fullpath}/{getCorrect(name)}.mp3"
-            )
-
-            if path:
-
-                os.rename(
-                    f"{fullpath}/{getCorrect(name)}.mp3",
-                    f"{path}/{getCorrect(name)}.mp3"
-                )
-
-            #deleting cache
-            try: shutil.rmtree(f"cache/{info['uri']}")
-            except: pass
-
-            notify.send(f'{info["artist"][0]} - {info["name"]}')
-
-    def downloadByDeezerUrlPlaylistMode(self, playlist_url, path):
-
-        link = str(str(playlist_url).split('/')[-1]).split('?')[0]
-
-        #get info
-        playlist = self.__deezer.getPlaylist(link)
-
-        for info, i in zip(playlist['tracks'],range(len(playlist['tracks']))):
-
-            notify.send(f'{info["artist"][0]} - {info["name"]}', downloaded=False)
-
-            print(f'Downloading {i+1} of {len(playlist["tracks"])}')
-
-            fixed_name = f'{info["artist"][0]} - {info["name"]}'
-            fixed_name = fixed_name.replace('.','')
-            fixed_name = fixed_name.replace(',','')
-            fixed_name = fixed_name.replace("'",'')
-            fixed_name = fixed_name.replace("/","")
-
-            #finding and download from YouTube and tagging
-            self.__downloadMusicFromYoutube(fixed_name, info['uri'], info['duration_ms'])
-
-            self.__editor.setTags(
-                data=info
-            )
-
-            cachepath = os.getcwd() + '/cache'
-            fullpath = os.getcwd() + '/Downloads'
-
-            if not os.path.exists(fullpath):
-                os.makedirs(fullpath)
-
-            name = f'{info["artist"][0]} - {info["name"]}'
-
-            os.rename(
-                f"{cachepath}/{info['uri']}/{info['uri']}.mp3",
-                f"{fullpath}/{getCorrect(name)}.mp3"
-            )
-
-            if path:
-
-                os.rename(
-                    f"{fullpath}/{getCorrect(name)}.mp3",
-                    f"{path}/{getCorrect(name)}.mp3"
-                )
-
-            #deleting cache
-            try: shutil.rmtree(f"cache/{info['uri']}")
-            except: pass
-
-            notify.send(f'{info["artist"][0]} - {info["name"]}')
-
+    
     def downloadFromYoutubeMusic(self, url, info, path):
 
         print(info)
