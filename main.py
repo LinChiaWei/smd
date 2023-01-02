@@ -2,6 +2,7 @@
 from spotify import Spotify
 from youtube import Youtube
 from download_song import *
+from get_songs import *
 import sys, getopt, shutil
 import os, re, random
 import notify2
@@ -17,7 +18,46 @@ class MusicDownloader(object):
         self.__file = download_file()
         self.__query = download_Query()
         self.__playlist = download_playlist()
+        self.__getdata = get_song_info()
         self.type = type
+
+    def __downloadMusicFromYoutube(self, name, uri, dur):
+        #finding song on youtube
+        self.__youtube.get(name, dur)
+
+        notify.send(f'Downloading from YouTube', downloaded=False)
+
+        #downloading video from youtube
+        if self.__youtube.download(
+            url=self.__youtube.getResult(),
+            path=uri,
+            filename=uri
+        ):
+            #converting video to mp3 file
+            self.__youtube.convertVideoToMusic(
+                uri=uri
+            )
+            return True
+        else:
+            return False
+
+    def __getSongInfoFromSpotify(self, uri):
+        try:
+            return self.__spotify.getSongInfo(uri)
+        except:
+            return None
+
+    def getNameFromYoutube(self, url):
+            return self.__youtube.getNameFromYoutube(url)
+
+    def getData(self, uri):
+        try:
+            return self.__spotify.getSongInfo(uri)
+        except:
+            return None
+
+    def getYoutubeMusicInfo(self, url):
+        return self.__youtube.getNameFromYoutube(url)
 
     def download(self):
         if self.type == "uri":
@@ -30,6 +70,9 @@ class MusicDownloader(object):
             self.__query.downloadBySearchQuery()
         else:
             self.__playlist.downloadBySpotifyUriPlaylistMode()
+
+
+
 
 
 

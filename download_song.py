@@ -3,25 +3,6 @@ from youtube import Youtube
 from main import MusicDownloader
 
 class download_uri(MusicDownloader):
-    def __downloadMusicFromYoutube(self, name, uri, dur):
-        #finding song on youtube
-        self.__youtube.get(name, dur)
-
-        notify.send(f'Downloading from YouTube', downloaded=False)
-
-        #downloading video from youtube
-        if self.__youtube.download(
-            url=self.__youtube.getResult(),
-            path=uri,
-            filename=uri
-        ):
-            #converting video to mp3 file
-            self.__youtube.convertVideoToMusic(
-                uri=uri
-            )
-            return True
-        else:
-            return False
 
     def downloadBySpotifyUri(self, uri, path):
         #get info
