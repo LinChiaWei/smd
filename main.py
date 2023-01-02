@@ -21,6 +21,8 @@ class MusicDownloader(object):
         self.__last = LastFM()
         self.__apple = AppleMusic()
         self.__deezer = Deezer()
+        self.__download = download_song()
+        self.__getinfo = get_song_info()
 
 
 
@@ -100,7 +102,7 @@ _____/\\\\\\\\\\\\\\\\\\\\\\____/\\\\\\\\____________/\\\\\\\\__/\\\\\\\\\\\\\\\
             elif array[i] in ('-ss','--spotify-song'):
                 try:
                     md = MusicDownloader()
-                    state = md.downloadBySpotifyUri(array[i+1], CLI.path)
+                    state = md.__download.downloadBySpotifyUri(array[i+1], CLI.path)
                     if not state:
                         notify.send(f'Failed to download',True)
                 except KeyboardInterrupt:
@@ -111,7 +113,7 @@ _____/\\\\\\\\\\\\\\\\\\\\\\____/\\\\\\\\____________/\\\\\\\\__/\\\\\\\\\\\\\\\
 
                 try:
                    md = MusicDownloader()
-                   md.downloadBySpotifyUriAlbumMode(array[i+1], CLI.path)
+                   md.__download.downloadBySpotifyUriAlbumMode(array[i+1], CLI.path)
                 except KeyboardInterrupt:
                   sys.exit(0)
                 sys.exit(0)
@@ -121,7 +123,7 @@ _____/\\\\\\\\\\\\\\\\\\\\\\____/\\\\\\\\____________/\\\\\\\\__/\\\\\\\\\\\\\\\
                 #playlist uri
                 try:
                    md = MusicDownloader()
-                   md.downloadBySpotifyUriPlaylistMode(array[i+1], CLI.path)
+                   md.__download.downloadBySpotifyUriPlaylistMode(array[i+1], CLI.path)
                 except KeyboardInterrupt:
                   sys.exit(0)
                 sys.exit(0)
@@ -130,7 +132,7 @@ _____/\\\\\\\\\\\\\\\\\\\\\\____/\\\\\\\\____________/\\\\\\\\__/\\\\\\\\\\\\\\\
 
                 try:
                     md = MusicDownloader()
-                    state = md.downloadByDeezerUrl(array[i+1], CLI.path)
+                    state = md.__download.downloadByDeezerUrl(array[i+1], CLI.path)
                     if not state:
                         notify.send(f'Failed to download',True)
                 except KeyboardInterrupt:
@@ -141,7 +143,7 @@ _____/\\\\\\\\\\\\\\\\\\\\\\____/\\\\\\\\____________/\\\\\\\\__/\\\\\\\\\\\\\\\
 
                 try:
                    md = MusicDownloader()
-                   md.downloadByDeezerUrlAlbumMode(array[i+1], CLI.path)
+                   md.__download.downloadByDeezerUrlAlbumMode(array[i+1], CLI.path)
                 except KeyboardInterrupt:
                   sys.exit(0)
                 sys.exit(0)
@@ -151,7 +153,7 @@ _____/\\\\\\\\\\\\\\\\\\\\\\____/\\\\\\\\____________/\\\\\\\\__/\\\\\\\\\\\\\\\
                 #playlist uri
                 try:
                    md = MusicDownloader()
-                   md.downloadByDeezerUrlPlaylistMode(array[i+1], CLI.path)
+                   md.__download.downloadByDeezerUrlPlaylistMode(array[i+1], CLI.path)
                 except KeyboardInterrupt:
                   sys.exit(0)
                 sys.exit(0)
@@ -163,11 +165,11 @@ _____/\\\\\\\\\\\\\\\\\\\\\\____/\\\\\\\\____________/\\\\\\\\__/\\\\\\\\\\\\\\\
                      link = ''.join(str(array[i+1]).split('music.')).split('&')[0]
 
                      md = MusicDownloader()
-                     name = md.getYoutubeMusicInfo(link)
-                     tags = md.getLastFMTags(name)
+                     name = md.__getinfo.getYoutubeMusicInfo(link)
+                     tags = md.__getinfo.getLastFMTags(name)
 
                      try:
-                         state = md.downloadFromYoutubeMusic(url=link, info=tags, path=CLI.path)
+                         state = md.__download.downloadFromYoutubeMusic(url=link, info=tags, path=CLI.path)
                      except:
                          notify.send(f'Failed to download',True)
 
@@ -181,7 +183,7 @@ _____/\\\\\\\\\\\\\\\\\\\\\\____/\\\\\\\\____________/\\\\\\\\__/\\\\\\\\\\\\\\\
                 try:
 
                     md = MusicDownloader()
-                    name = md.getNameFromYoutube(array[i+1])
+                    name = md.__getinfo.getNameFromYoutube(array[i+1])
 
                     uri = random.randint(1000000000,10000000000)
                     uri = 's' + str(uri) + 't'
@@ -195,7 +197,7 @@ _____/\\\\\\\\\\\\\\\\\\\\\\____/\\\\\\\\____________/\\\\\\\\__/\\\\\\\\\\\\\\\
                         'duration_ms' : 0
                     }
 
-                    state = md.downloadFromYoutubeMusic(url=array[i+1], info=info, path=CLI.path)
+                    state = md.__download.downloadFromYoutubeMusic(url=array[i+1], info=info, path=CLI.path)
 
                     if not state:
                        notify.send(f'Failed to download',True)
@@ -211,7 +213,7 @@ _____/\\\\\\\\\\\\\\\\\\\\\\____/\\\\\\\\____________/\\\\\\\\__/\\\\\\\\\\\\\\\
                     md = MusicDownloader()
                     apple = AppleMusic()
                     name = apple.getName(array[i+1])
-                    state = md.downloadBySearchQuery(query=name, path=CLI.path)
+                    state = md.__download.downloadBySearchQuery(query=name, path=CLI.path)
                     if not state:
                         notify.send(f'Failed to download',True)
                 except KeyboardInterrupt:
@@ -223,7 +225,7 @@ _____/\\\\\\\\\\\\\\\\\\\\\\____/\\\\\\\\____________/\\\\\\\\__/\\\\\\\\\\\\\\\
 
                 try:
                    md = MusicDownloader()
-                   state, data = md.downloadBySearchQuery(query=array[i+1], path=CLI.path)
+                   state, data = md.__download.downloadBySearchQuery(query=array[i+1], path=CLI.path)
                    if not state:
                        notify.send(f'Failed to download',True)
                 except KeyboardInterrupt:
