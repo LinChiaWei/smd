@@ -11,68 +11,7 @@ from pygame import mixer
 
 class MusicDownloader(object):
     def __init__(self,type):
-        self.__youtube = Youtube()
-        self.__spotify = Spotify()
-        self.__uri = download_uri()
-        self.__album = download_album()
-        self.__file = download_file()
-        self.__query = download_Query()
-        self.__playlist = download_playlist()
-        self.__getdata = get_song_info()
-        self.type = type
-
-    def __downloadMusicFromYoutube(self, name, uri, dur):
-        #finding song on youtube
-        self.__youtube.get(name, dur)
-
-        notify.send(f'Downloading from YouTube', downloaded=False)
-
-        #downloading video from youtube
-        if self.__youtube.download(
-            url=self.__youtube.getResult(),
-            path=uri,
-            filename=uri
-        ):
-            #converting video to mp3 file
-            self.__youtube.convertVideoToMusic(
-                uri=uri
-            )
-            return True
-        else:
-            return False
-
-    def __getSongInfoFromSpotify(self, uri):
-        try:
-            return self.__spotify.getSongInfo(uri)
-        except:
-            return None
-
-    def getNameFromYoutube(self, url):
-            return self.__youtube.getNameFromYoutube(url)
-
-    def getData(self, uri):
-        try:
-            return self.__spotify.getSongInfo(uri)
-        except:
-            return None
-
-    def getYoutubeMusicInfo(self, url):
-        return self.__youtube.getNameFromYoutube(url)
-
-    def download(self):
-        if self.type == "uri":
-            self.__uri.downloadBySpotifyUri()
-        elif self.type == "album":
-            self.__album.downloadBySpotifyUriAlbumMode()
-        elif self.type == "file":
-            self.__file.downloadBySpotifyUriFromFile()
-        elif self.type == "query":
-            self.__query.downloadBySearchQuery()
-        else:
-            self.__playlist.downloadBySpotifyUriPlaylistMode()
-
-
-
+        self.__spotify_download = Spotify_Download(type)
 
 
 
@@ -151,7 +90,7 @@ _____/\\\\\\\\\\\\\\\\\\\\\\____/\\\\\\\\____________/\\\\\\\\__/\\\\\\\\\\\\\\\
             else:
                 try:
                     md = MusicDownloader()
-                    state = md.download(argv)
+                    state = md.__spotify_download(argv)
                     if not state:
                             notify.send(f'Failed to download',True)
                 except KeyboardInterrupt:

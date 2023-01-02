@@ -1,8 +1,70 @@
 from spotify import Spotify
 from youtube import Youtube
-from main import MusicDownloader
+from main import notify, getCorrect
+import sys, getopt, shutil
+import os 
 
-class download_uri(MusicDownloader):
+class Spotify_Download():
+    def __init__(self,type):
+        self.__youtube = Youtube()
+        self.__spotify = Spotify()
+        self.__uri = download_uri()
+        self.__album = download_album()
+        self.__file = download_file()
+        self.__query = download_Query()
+        self.__playlist = download_playlist()
+        self.type = type
+
+    def __downloadMusicFromYoutube(self, name, uri, dur):
+        #finding song on youtube
+        self.__youtube.get(name, dur)
+
+
+        #downloading video from youtube
+        if self.__youtube.download(
+            url=self.__youtube.getResult(),
+            path=uri,
+            filename=uri
+        ):
+            #converting video to mp3 file
+            self.__youtube.convertVideoToMusic(
+                uri=uri
+            )
+            return True
+        else:
+            return False
+
+    def __getSongInfoFromSpotify(self, uri):
+        try:
+            return self.__spotify.getSongInfo(uri)
+        except:
+            return None
+
+    def getNameFromYoutube(self, url):
+            return self.__youtube.getNameFromYoutube(url)
+
+    def getData(self, uri):
+        try:
+            return self.__spotify.getSongInfo(uri)
+        except:
+            return None
+
+    def getYoutubeMusicInfo(self, url):
+        return self.__youtube.getNameFromYoutube(url)
+
+    def download(self):
+        if self.type == "uri":
+            self.__uri.downloadBySpotifyUri()
+        elif self.type == "album":
+            self.__album.downloadBySpotifyUriAlbumMode()
+        elif self.type == "file":
+            self.__file.downloadBySpotifyUriFromFile()
+        elif self.type == "query":
+            self.__query.downloadBySearchQuery()
+        else:
+            self.__playlist.downloadBySpotifyUriPlaylistMode()
+
+class download_uri(Spotify_Download):
 
     def downloadBySpotifyUri(self, uri, path):
         #get info
@@ -60,7 +122,7 @@ class download_uri(MusicDownloader):
         return False
 
 
-class download_Query(MusicDownloader):
+class download_Query(Spotify_Download):
     def downloadBySearchQuery(self, query, path=None):
 
         #get info
@@ -117,7 +179,7 @@ class download_Query(MusicDownloader):
         else:
             return False, None
 
-class download_file(MusicDownloader):
+class download_file(Spotify_Download):
 
     def downloadBySpotifyUriFromFile(self, filename):
         try:
@@ -144,7 +206,7 @@ class download_file(MusicDownloader):
             except:
                 print('Something went wrong!')
 
-class download_playlist(MusicDownloader):
+class download_playlist(Spotify_Download):
     def downloadBySpotifyUriPlaylistMode(self, playlist_uri, path):
 
         user = Spotify.User()
@@ -199,7 +261,7 @@ class download_playlist(MusicDownloader):
             notify.send(f'{info["artist"][0]} - {info["name"]}')
 
 
-class download_album(MusicDownloader):
+class download_album(Spotify_Download):
     def downloadBySpotifyUriAlbumMode(self, album_uri, path):
 
         user = Spotify()
